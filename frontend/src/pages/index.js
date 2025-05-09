@@ -40,19 +40,21 @@ export default function Home() {
         
         {!user && (
           <div className="space-x-4">
-            <Link href="/auth/register">
-              <a className="btn-primary px-6 py-3">
+            <Link href="/auth/register" className="btn-primary px-6 py-3">
+              
                 Get Started
-              </a>
+              
             </Link>
-            <Link href="/materials">
-              <a className="border border-blue-600 text-blue-600 px-6 py-3 rounded hover:bg-blue-50">
+            <Link
+              href="/materials"
+              className="border border-blue-600 text-blue-600 px-6 py-3 rounded hover:bg-blue-50">
+              
                 Browse Materials
-              </a>
+              
             </Link>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

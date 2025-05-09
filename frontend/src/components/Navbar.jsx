@@ -7,19 +7,19 @@ export default function Navbar() {
   return (
     <nav className="bg-blue-600 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/">
-          <a className="text-xl font-bold">StudyPlatform</a>
+        <Link href="/" className="text-xl font-bold">
+          StudyPlatform
         </Link>
         
         <div className="flex space-x-4">
-          <Link href="/materials">
-            <a className="hover:underline">Materials</a>
+          <Link href="/materials" className="hover:underline">
+            Materials
           </Link>
           
           {user ? (
             <>
-              <Link href="/dashboard">
-                <a className="hover:underline">Dashboard</a>
+              <Link href="/dashboard" className="hover:underline">
+                Dashboard
               </Link>
               <button 
                 onClick={logout}
@@ -30,16 +30,16 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/auth/login">
-                <a className="hover:underline">Login</a>
+              <Link href="/auth/login" className="hover:underline">
+                Login
               </Link>
-              <Link href="/auth/register">
-                <a className="hover:underline">Register</a>
+              <Link href="/auth/register" className="hover:underline">
+                Register
               </Link>
             </>
           )}
         </div>
       </div>
     </nav>
-  )
+  );
 }

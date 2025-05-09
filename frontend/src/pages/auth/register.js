@@ -1,140 +1,63 @@
-import { useState } from 'react'
-import { useRouter } from 'next/router'
-import { useAuth } from '../../context/AuthContext'
-import Link from 'next/link'
+// src/pages/auth/register.js
 
-export default function Register() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    first_name: '',
-    last_name: ''
-  })
-  const [error, setError] = useState('')
-  const { register } = useAuth()
-  const router = useRouter()
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+export default function RegisterPage() {
+    const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      await register(formData)
-    } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed')
-    }
-  }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            // Replace with your actual backend registration endpoint
+            await axios.post('http://127.0.0.1:8000/api/auth/register', credentials);
+            alert('Registration successful!');
+            router.push('/auth/login'); // Redirect to login page after registration
+        } catch (error) {
+            console.error('Registration failed:', error.response?.data || error.message);
+            alert('Registration failed. Please try again.');
+        }
+    };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create a new account
-          </h2>
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+                <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">Email:</label>
+                        <input
+                            type="email"
+                            value={credentials.email}
+                            onChange={(e) =>
+                                setCredentials({ ...credentials, email: e.target.value })
+                            }
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        />
+                    </div>
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700">Password:</label>
+                        <input
+                            type="password"
+                            value={credentials.password}
+                            onChange={(e) =>
+                                setCredentials({ ...credentials, password: e.target.value })
+                            }
+                            required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                        Register
+                    </button>
+                </form>
+            </div>
         </div>
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="username" className="sr-only">Username</label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="first_name" className="sr-only">First Name</label>
-                <input
-                  id="first_name"
-                  name="first_name"
-                  type="text"
-                  className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="First Name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="last_name" className="sr-only">Last Name</label>
-                <input
-                  id="last_name"
-                  name="last_name"
-                  type="text"
-                  className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Last Name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Register
-            </button>
-          </div>
-        </form>
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link href="/auth/login">
-              <a className="font-medium text-blue-600 hover:text-blue-500">
-                Sign in
-              </a>
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
-  )
+    );
 }

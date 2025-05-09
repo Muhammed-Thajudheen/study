@@ -23,11 +23,9 @@ export default function MaterialCard({ material }) {
           <p className="text-sm text-gray-600">{material.course_name}</p>
         </div>
       </div>
-      
       <p className="text-sm text-gray-500 mb-4 line-clamp-3 flex-1">
         {material.description || 'No description available'}
       </p>
-      
       <div className="flex justify-between items-center text-sm">
         <span className="text-gray-500">
           {new Date(material.upload_date).toLocaleDateString()}
@@ -39,12 +37,13 @@ export default function MaterialCard({ material }) {
           {material.download_count}
         </span>
       </div>
-      
-      <Link href={`/materials/${material.id}`}>
-        <a className="mt-4 inline-block text-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+      <Link
+        href={`/materials/${material.id}`}
+        className="mt-4 inline-block text-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+        
           View Details
-        </a>
+        
       </Link>
     </div>
-  )
+  );
 }
