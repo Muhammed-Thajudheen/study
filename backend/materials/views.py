@@ -1,92 +1,62 @@
-# materials/views.py
-from rest_framework import viewsets, permissions, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.contrib.auth import get_user_model
-from .models import Subject, Course, StudyMaterial
-from .serializers import SubjectSerializer, CourseSerializer, StudyMaterialSerializer, UserSerializer
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import status
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from .serializers import (
+    RegisterSerializer,
+    CourseSerializer,
+    SubjectSerializer,
+    StudyMaterialSerializer,
+)
+from .models import Course, Subject, StudyMaterial
 
-User = get_user_model()
 
-class SubjectViewSet(viewsets.ModelViewSet):
-    queryset = Subject.objects.all()
-    serializer_class = SubjectSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        subject_id = self.request.query_params.get('subject_id')
-        if subject_id:
-            queryset = queryset.filter(subject_id=subject_id)
-        return queryset
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+        return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-class StudyMaterialViewSet(viewsets.ModelViewSet):
-    queryset = StudyMaterial.objects.all()
-    serializer_class = StudyMaterialSerializer
-    parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        search = self.request.query_params.get('search')
-        course_id = self.request.query_params.get('course_id')
-        
-        if search:
-            queryset = queryset.filter(title__icontains=search)
-        if course_id:
-            queryset = queryset.filter(course_id=course_id)
-            
-        return queryset
+class CourseListView(APIView):
+    def get(self, request):
+        courses = Course.objects.all()
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def perform_create(self, serializer):
-        serializer.save(uploaded_by=self.request.user)
 
-    @action(detail=True, methods=['post'])
-    def increment_download(self, request, pk=None):
-        material = self.get_object()
-        material.download_count += 1
-        material.save()
-        return Response({'status': 'download count incremented'})
+class SubjectListView(APIView):
+    def get(self, request):
+        subjects = Subject.objects.all()
+        serializer = SubjectSerializer(subjects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token['username'] = user.username
-        return token
 
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        data['user'] = UserSerializer(self.user).data
-        return data
+class StudyMaterialListView(APIView):
+    def get(self, request):
+        study_materials = StudyMaterial.objects.all()
+        serializer = StudyMaterialSerializer(study_materials, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser]
-
-    @action(detail=False, methods=['get'])
-    def current_user(self, request):
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
-    def register(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response({
-            'user': serializer.data,
-            'message': 'User created successfully'
-        }, status=status.HTTP_201_CREATED)
+class StudyMaterialDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            study_material = StudyMaterial.objects.get(pk=pk)
+            serializer = StudyMaterialSerializer(study_material)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except StudyMaterial.DoesNotExist:
+            return Response({"message": "Study material not found"}, status=status.HTTP_404_NOT_FOUND)

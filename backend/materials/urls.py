@@ -1,10 +1,25 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
-from .views import SubjectViewSet, CourseViewSet, StudyMaterialViewSet
+from .views import (
+    RegisterView,
+    LoginView,
+    CourseListView,
+    SubjectListView,
+    StudyMaterialListView,
+    StudyMaterialDetailView,
+)
 
-router = DefaultRouter()
-router.register(r'subjects', SubjectViewSet)
-router.register(r'courses', CourseViewSet)
-router.register(r'materials', StudyMaterialViewSet)
+urlpatterns = [
+    # Authentication
+    path('auth/register/', RegisterView.as_view(), name='register'),
+    path('auth/login/', LoginView.as_view(), name='login'),
 
-urlpatterns = router.urls
+    # Courses
+    path('courses/', CourseListView.as_view(), name='course-list'),
+
+    # Subjects
+    path('subjects/', SubjectListView.as_view(), name='subject-list'),
+
+    # Study Materials
+    path('study-materials/', StudyMaterialListView.as_view(), name='study-material-list'),
+    path('study-materials/<int:pk>/', StudyMaterialDetailView.as_view(), name='study-material-detail'),
+]
