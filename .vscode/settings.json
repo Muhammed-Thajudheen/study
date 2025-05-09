@@ -1,10 +1,10 @@
-{
-    "python.pythonPath": "venv\\Scripts\\python.exe",
-    "python.linting.enabled": true,
-    "files.exclude": {
-      "**/.git": true,
-      "**/.DS_Store": true,
-      "**/__pycache__": true,
-      "**/venv": true
-    }
+  
+  {
+  "css.customData": [".vscode/tailwind.json"],
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "css"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
   }
+}

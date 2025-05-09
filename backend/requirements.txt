@@ -1,4 +1,12 @@
-Django==5.0.4  # Latest stable Django (or 4.2.11 for LTS)
-djangorestframework==3.15.1
+asgiref==3.8.1
+Django==5.0.4
+djangorestframework==3.15.0
+djangorestframework-simplejwt==5.2.2
 mysqlclient==2.2.1
-Pillow==10.2.0  # Must use Pillow 10+ for Python 3.13
+pillow==10.2.0
+PyJWT==2.10.1
+setuptools==80.3.1
+sqlparse==0.5.3
+tzdata==2025.2
+wheel==0.45.1
+django-cors-headers==4.3.1  # or the latest version

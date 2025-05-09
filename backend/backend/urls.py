@@ -14,17 +14,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from materials.views import CustomTokenObtainPairView, UserViewSet
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
+from materials.views import (  # Add this import
+    SubjectViewSet,
+    CourseViewSet,
+    StudyMaterialViewSet,
+    CustomTokenObtainPairView,
+    UserViewSet
+)
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='user')
 router.register(r'subjects', SubjectViewSet)
 router.register(r'courses', CourseViewSet)
 router.register(r'materials', StudyMaterialViewSet)
+router.register(r'users', UserViewSet, basename='user')
+
+from .views import home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('api/auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-]
+    path('api/', include('materials.urls')),
+    path('', home, name='home'),  # Add this line
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
