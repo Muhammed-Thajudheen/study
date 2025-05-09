@@ -1,63 +1,27 @@
-import { createContext, useState, useEffect } from 'react'
-import axios from 'axios'
-import { useRouter } from 'next/router'
+// src/context/AuthContext.js
 
-export const AuthContext = createContext()
+import { createContext, useContext } from 'react';
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
+// Create the AuthContext
+const AuthContext = createContext();
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        if (token) {
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-          const res = await axios.get('http://localhost:8000/api/auth/user/')
-          setUser(res.data)
-        }
-      } catch (err) {
-        console.error(err)
-        localStorage.removeItem('token')
-        delete axios.defaults.headers.common['Authorization']
-      } finally {
-        setLoading(false)
-      }
+// Custom hook to use the AuthContext
+export function useAuth() {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
     }
-    loadUser()
-  }, [])
+    return context;
+}
 
-  const login = async (email, password) => {
-    const res = await axios.post('http://localhost:8000/api/auth/login/', {
-      email,
-      password
-    })
-    localStorage.setItem('token', res.data.token)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-    setUser(res.data.user)
-    router.push('/dashboard')
-  }
+// Provider component
+export function AuthProvider({ children }) {
+    const user = { name: 'John Doe' }; // Replace with actual authentication logic
+    const logout = () => console.log('Logged out'); // Replace with actual logout logic
 
-  const register = async (userData) => {
-    const res = await axios.post('http://localhost:8000/api/auth/register/', userData)
-    localStorage.setItem('token', res.data.token)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-    setUser(res.data.user)
-    router.push('/dashboard')
-  }
-
-  const logout = () => {
-    localStorage.removeItem('token')
-    delete axios.defaults.headers.common['Authorization']
-    setUser(null)
-    router.push('/auth/login')
-  }
-
-  return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
-      {children}
-    </AuthContext.Provider>
-  )
+    return (
+        <AuthContext.Provider value={{ user, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 }
